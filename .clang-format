@@ -36,7 +36,7 @@ JavaScriptQuotes: Single
 KeepEmptyLinesAtTheStartOfBlocks: 'false'
 Language: Cpp
 MaxEmptyLinesToKeep: '2'
-NamespaceIndentation: None
+NamespaceIndentation: All
 ObjCBlockIndentWidth: '4'
 ObjCSpaceAfterProperty: 'false'
 ObjCSpaceBeforeProtocolList: 'false'
