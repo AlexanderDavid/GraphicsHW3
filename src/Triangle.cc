@@ -1,4 +1,4 @@
-#include "dummy.hh"
+#include "Triangle.hh"
 
 #include <algorithm>
 
