@@ -1,27 +1,49 @@
 #include "Triangle.hh"
 
+#include <Eigen/OpenGLSupport>
 namespace triangle
 {
-    Triangle::Triangle(const Point& point1, const Point& point2, const Point& point3)
+    Triangle::Triangle(const Point& point1,
+                       const Point& point2,
+                       const Point& point3,
+                       const Color& color)
     {
-        point1_ = std::move(point1);
-        point2_ = std::move(point2);
-        point3_ = std::move(point3);
+        point1_ = point1;
+        point2_ = point2;
+        point3_ = point3;
+        color_  = color;
     }
 
-    const double Triangle::area()
+    auto Triangle::area() -> const double
     {
-        auto AB = point1_ - point2_;
-        auto AC = point1_ - point3_;
-        auto angle = std::atan2(AB.cross(AC).norm(), AB.dot(AC));
+        auto edge1 = point2_ - point1_;
+        auto edge2 = point3_ - point1_;
 
-        // https://math.stackexchange.com/questions/128991/how-to-calculate-the-area-of-a-3d-triangle
-        return 0.5 * AB.norm() * AC.norm() * std::sin(angle);
+        return 0.5 * edge1.cross(edge2).norm();
     }
 
-    const Vector Triangle::unitNormal() { return {}; }
+    auto Triangle::unitNormal() -> const Vector
+    {
+        auto edge1 = point2_ - point1_;
+        auto edge2 = point3_ - point1_;
 
-    const std::tuple<Vector, Vector, Vector> Triangle::edgeVectors() { return {}; }
+        return edge2.cross(edge1) / edge2.cross(edge1).norm();
+    }
 
-    const std::pair<double, double> Triangle::aspectRatio() { return {}; }
+    auto Triangle::edgeVectors() -> const std::tuple<Vector, Vector, Vector>
+    {
+        return { point2_ - point1_, point3_ - point1_, point3_ - point2_ };
+    }
+
+    auto Triangle::aspectRatio() -> const std::pair<double, double>
+    {
+        auto edge1Length = (point2_ - point1_).norm();
+        auto edge2Length = (point3_ - point1_).norm();
+        auto edge3Length = (point3_ - point2_).norm();
+
+        return { std::max({ edge1Length, edge2Length, edge3Length }),
+                 std::min({ edge1Length, edge2Length, edge3Length }) };
+    }
+
+    auto Triangle::draw() -> void {}
 }

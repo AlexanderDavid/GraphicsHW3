@@ -9,21 +9,25 @@ namespace triangle
 {
     using Point  = Eigen::Vector3d;
     using Vector = Eigen::Vector3d;
+    using Color  = Eigen::Vector3d;
 
     class Triangle
     {
     public:
-        Triangle(const Point& point1, const Point& point2, const Point& point3);
+        Triangle(const Point& point1, const Point& point2, const Point& point3, const Color& color);
 
-        const double                             area();
-        const Vector                             unitNormal();
-        const std::tuple<Vector, Vector, Vector> edgeVectors();
-        const std::pair<double, double>          aspectRatio();
+        auto area() -> const double;
+        auto unitNormal() -> const Vector;
+        auto edgeVectors() -> const std::tuple<Vector, Vector, Vector>;
+        auto aspectRatio() -> const std::pair<double, double>;
+
+        auto draw() -> void;
 
     private:
         Point point1_;
         Point point2_;
         Point point3_;
+        Color color_;
     };
 
 }
