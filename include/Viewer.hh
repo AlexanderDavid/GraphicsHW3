@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <mutex>
+#include <memory>
 
 #include <GL/glut.h>
 
@@ -14,12 +15,6 @@ namespace viewer
     class Viewer
     {
     public:
-        /**
-         * Construct the singleton instance of the viewer.
-         * TODO: Make into an actual singleton
-         **/
-        Viewer();
-
         /**
          * Set up the OpenGL window and canvas
          *
@@ -36,6 +31,8 @@ namespace viewer
          **/
         static auto go() -> void { glutMainLoop(); }
 
+        static Viewer* instance_;
+
     protected:
         /**
          * Class level openGL callbacks. These contain the actual callback code that will be called
@@ -47,9 +44,6 @@ namespace viewer
         virtual auto mouse(int b, int state, int x, int y) -> void     = 0;
         virtual auto keyboard(unsigned char key, int x, int y) -> void = 0;
 
-
-        static Viewer* instance_;
-
     private:
         /**
          * Static method callbacks using the singleton of the viewer for OpenGL
@@ -60,6 +54,10 @@ namespace viewer
         static auto mouseCb(int b, int state, int x, int y) -> void
         {
             instance_->mouse(b, state, x, y);
+        }
+        static auto keyboardCb(unsigned char key, int x, int y) -> void
+        {
+            instance_->keyboard(key, x, y);
         }
     };
 }

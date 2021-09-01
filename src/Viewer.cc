@@ -6,12 +6,6 @@
 
 namespace viewer
 {
-    Viewer::Viewer()
-    {
-        // Set the instance for the static opengl methods :(
-        instance_ = this;
-    }
-
     auto Viewer::setup(int* argc, char** argv, int width, int height) -> void
     {
         glutInit(argc, argv);
@@ -20,13 +14,15 @@ namespace viewer
         glutInitWindowPosition(100, 100);
         glutCreateWindow("CPSC 6050");
 
-        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClearColor(0.5, 0.5, 0.6, 0.0);
         glEnable(GL_DEPTH_TEST);
 
         glutDisplayFunc(&displayCb);
         glutReshapeFunc(&resizeCb);
         glutMotionFunc(&motionCb);
         glutMouseFunc(&mouseCb);
+        glutKeyboardFunc(&keyboardCb);
     }
 
+    Viewer* Viewer::instance_ = nullptr;
 }
