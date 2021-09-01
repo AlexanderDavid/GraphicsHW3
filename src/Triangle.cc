@@ -2,8 +2,12 @@
 
 #include "Triangle.hh"
 
+#include <cmath>
+#include <fstream>
 #include <iostream>
-#include <stdlib.h>
+#include <sstream>
+#include <random>
+#include <cstdlib>
 
 namespace triangle
 {
@@ -66,6 +70,47 @@ namespace triangle
         glEnd();
     }
 
+    auto Triangle::generateTriangles(std::string stlFile) -> std::vector<Triangle>
+    {
+        std::string   line;
+        std::ifstream file{ stlFile };
+
+        if (!file.is_open())
+        {
+            std::cerr << "Couldn't open stl file: " << stlFile;
+            return {};
+        }
+
+        std::vector<Triangle> triangles{};
+        std::vector<Point>    points{};
+        int                   i = 0;
+        while (getline(file, line))
+        {
+            if (points.size() == 3)
+            {
+                Color color{ drand48(), drand48(), drand48() };
+                triangles.emplace_back(points[0], points[1], points[2], color);
+                points.clear();
+            }
+
+            if (line.find("   vertex") == 0)
+            {
+                auto               tokens = line.substr(10);
+                std::stringstream  ss(tokens);
+                std::string        buf;
+                std::vector<float> coords{};
+                while (ss >> buf)
+                {
+                    coords.push_back(std::stof(buf));
+                }
+                points.emplace_back(coords[0], coords[1], coords[2]);
+            }
+        }
+
+        std::cout << triangles.size() << " triangles loaded\n";
+        return triangles;
+    }
+
     auto Triangle::generateTriangles(size_t numTriangles,
                                      double maximumAngle,
                                      int    minMag,
@@ -75,8 +120,8 @@ namespace triangle
         std::vector<Triangle> triangles{};
 
         // Define a base triangle that is valid.
-        triangle::Triangle    triangle{
-            { 0, 0, 0 }, { 0, 1.5, 0 }, { 0, 0.5, 0 }, { drand48(), drand48(), drand48() }
+        triangle::Triangle triangle{
+            { 0, 0, 0 }, { 0, 0, 1.001 }, { 0, 1.001, 0 }, { drand48(), drand48(), drand48() }
         };
         triangles.push_back(triangle);
 
@@ -89,36 +134,7 @@ namespace triangle
             // Loop until a valid triangle is found
             while (true)
             {
-                // Define a random vector that will be added to a randomly chosen point
-                Vector randomVector{ drand48() * 3, drand48() * 3, drand48() * 3 };
-
-                // Shuffle the points of the old triangle
-                std::vector<Vector> vectors = { point1, point2, point3 };
-                std::random_shuffle(vectors.begin(), vectors.end());
-
-                // Define a new triangle that shares two random points with the old triangle but
-                // has its' third point randomly perturbed from the last point of the old triangle
-                triangle::Triangle newTriangle{ vectors[0] + randomVector,
-                                                vectors[1],
-                                                vectors[2],
-                                                { drand48(), drand48(), drand48() } };
-
-                // Check that the
-                if (0 > std::acos(newTriangle.unitNormal().dot(triangle.unitNormal()))
-                    > maximumAngle)
-                    continue;
-
-                // Check that the magnitude of any of the edges is not outside the specified range
-                auto [edge1, edge2, edge3] = newTriangle.edgeVectors();
-                if (std::abs(edge1.norm()) > maxMag || std::abs(edge1.norm()) < minMag
-                    || std::abs(edge2.norm()) > maxMag || std::abs(edge2.norm()) < minMag
-                    || std::abs(edge3.norm()) > maxMag || std::abs(edge3.norm()) < minMag)
-                    continue;
-
-                // This is a valid triangle. Remember its' points for the next triangle
-                point1 = newTriangle.point1_;
-                point2 = newTriangle.point2_;
-                point3 = newTriangle.point3_;
+                auto newTriangle = generateTriangle(triangles.back(), maximumAngle, minMag, maxMag);
 
                 // Add the triangle to the list and break out of the infinite validity check
                 triangles.push_back(newTriangle);
@@ -128,5 +144,43 @@ namespace triangle
 
 
         return triangles;
+    }
+
+
+    auto Triangle::generateTriangle(const Triangle& triangle,
+                                    double          maximumAngle,
+                                    int             minMag,
+                                    int             maxMag) -> Triangle
+    {
+        // Loop until a valid triangle is found
+        while (true)
+        {
+            // Define a random vector that will be added to a randomly chosen point
+            Vector randomVector{ drand48() * 3, drand48() * 3, drand48() * 3 };
+
+            // Shuffle the points of the old triangle
+            std::vector<Vector> points = { triangle.point1_, triangle.point2_, triangle.point3_ };
+            std::shuffle(points.begin(), points.end(), std::mt19937(std::random_device()()));
+
+            // Define a new triangle that shares two random points with the old triangle but
+            // has its' third point randomly perturbed from the last point of the old triangle
+            triangle::Triangle newTriangle{
+                points[0] + randomVector, points[1], points[2], { drand48(), drand48(), drand48() }
+            };
+
+            // Check that the angle is within acceptable ranges
+            auto angle = std::acos(newTriangle.unitNormal().dot(triangle.unitNormal()));
+            if (std::isnan(angle) || -maximumAngle > angle || angle > maximumAngle)
+                continue;
+
+            // Check that the magnitude of any of the edges is not outside the specified range
+            auto [edge1, edge2, edge3] = newTriangle.edgeVectors();
+            if (std::abs(edge1.norm()) > maxMag || std::abs(edge1.norm()) < minMag
+                || std::abs(edge2.norm()) > maxMag || std::abs(edge2.norm()) < minMag
+                || std::abs(edge3.norm()) > maxMag || std::abs(edge3.norm()) < minMag)
+                continue;
+
+            return newTriangle;
+        }
     }
 }
