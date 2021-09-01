@@ -77,22 +77,20 @@ namespace triangle
         triangles.push_back(triangle);
 
         auto [point1, point2, point3] = triangle.points();
-        auto [edge1, edge2, edge3] = triangle.edgeVectors();
+        auto [edge1, edge2, edge3]    = triangle.edgeVectors();
 
         for (size_t i = 0; i < numTriangles; i++)
         {
             while (true)
             {
-                Vector             randomVector{ drand48() * 3, drand48() * 3, drand48() * 3 };
+                Vector              randomVector{ drand48() * 3, drand48() * 3, drand48() * 3 };
                 std::vector<Vector> vectors = { point1, point2, point3 };
                 std::random_shuffle(vectors.begin(), vectors.end());
 
-                triangle::Triangle newTriangle{
-                    vectors[0] + randomVector,
-                    vectors[1],
-                    vectors[2],
-                    { drand48(), drand48(), drand48() }
-                };
+                triangle::Triangle newTriangle{ vectors[0] + randomVector,
+                                                vectors[1],
+                                                vectors[2],
+                                                { drand48(), drand48(), drand48() } };
 
                 auto [edge1, edge2, edge3] = newTriangle.edgeVectors();
 
@@ -105,7 +103,6 @@ namespace triangle
                     || std::abs(edge2.norm()) > 2 || std::abs(edge2.norm()) < 1
                     || std::abs(edge3.norm()) > 2 || std::abs(edge3.norm()) < 1)
                     continue;
-
 
 
                 point1 = newTriangle.point1_;
