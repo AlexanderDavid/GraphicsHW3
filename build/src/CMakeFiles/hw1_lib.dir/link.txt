@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../lib/libhw1_lib.a CMakeFiles/hw1_lib.dir/Triangle.cc.o CMakeFiles/hw1_lib.dir/Viewer.cc.o CMakeFiles/hw1_lib.dir/TriangleViewer.cc.o
-/usr/bin/ranlib ../lib/libhw1_lib.a

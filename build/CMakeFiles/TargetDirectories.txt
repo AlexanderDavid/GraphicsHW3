@@ -1,6 +1,0 @@
-/home/alex/code/GraphicsHW1/build/CMakeFiles/rebuild_cache.dir
-/home/alex/code/GraphicsHW1/build/CMakeFiles/edit_cache.dir
-/home/alex/code/GraphicsHW1/build/src/CMakeFiles/rebuild_cache.dir
-/home/alex/code/GraphicsHW1/build/src/CMakeFiles/edit_cache.dir
-/home/alex/code/GraphicsHW1/build/src/CMakeFiles/hw1_app.dir
-/home/alex/code/GraphicsHW1/build/src/CMakeFiles/hw1_lib.dir
