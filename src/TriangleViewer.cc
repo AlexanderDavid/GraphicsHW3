@@ -3,14 +3,14 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 
-namespace triangleviewer
+namespace viewer
 {
     TriangleViewer::TriangleViewer(int argc, char** argv, size_t numTriangles, double maxAngle)
+    : Viewer()
     {
-        // Set the instance for the static OpenGL callbacks :(
-        TriangleViewer::instance_ = this;
+        instance_ = this;
 
-        // Initializ OpenGL viewport instance variables
+        // Initialize OpenGL viewport instance variables
         camera_fov_     = 35.0;
         camera_aspect_  = 1.0;
         camera_near_    = 0.01;
@@ -39,14 +39,12 @@ namespace triangleviewer
 
         // Set up the viewer. Might make more sense to make TriangleViewer
         // a subclass of the Viewer...
-        vwr_.setup(&argc, argv);
-        vwr_.setDisplayCallback(&displayCb);
-        vwr_.setReshapeCallback(&resizeCb);
-        vwr_.setMotionCallback(&motionCb);
-        vwr_.setMouseCallback(&mouseCb);
+        setup(&argc, argv);
 
         // Initialize all of the triangles
-        triangles_ = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
+        numTriangles_ = numTriangles;
+        maxAngle_     = maxAngle;
+        triangles_    = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
     }
 
     auto TriangleViewer::display() -> void
@@ -112,6 +110,22 @@ namespace triangleviewer
         mouse_y_     = y;
         mouse_state_ = state;
         glGetFloatv(GL_CURRENT_RASTER_POSITION, current_raster_pos_);
+    }
+
+    auto TriangleViewer::keyboard(unsigned char key, int x, int y) -> void
+    {
+        switch (key)
+        {
+            case 'a':
+                maxAngle_ -= 0.05;
+                break;
+            case 'A':
+                maxAngle_ += 0.05;
+                break;
+        }
+
+        constexpr double ninety = 90 * M_PI / 180;
+        std::clamp(maxAngle_, 0.0, ninety);
     }
 
     auto TriangleViewer::computeCameraShift(int dx, int dy) -> void
@@ -187,5 +201,5 @@ namespace triangleviewer
         camera_eye_z_ = vvz * vvnorm + camera_view_z_;
     }
 
-    TriangleViewer* TriangleViewer::instance_ = nullptr;
+    Viewer* Viewer::instance_ = nullptr;
 }
