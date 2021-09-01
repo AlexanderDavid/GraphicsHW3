@@ -10,7 +10,7 @@
 auto main(int argc, char** argv) -> int
 {
     srand48(209238434234);
-    auto tv = triangleviewer::TriangleViewer(argc, argv, 30, 0.523599);
+    auto tv = viewer::TriangleViewer(argc, argv, 30, 0.523599);
 
     tv.go();
 
