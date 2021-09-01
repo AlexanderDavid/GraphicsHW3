@@ -3,10 +3,12 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 
+#include <algorithm>
+#include <iostream>
+
 namespace viewer
 {
     TriangleViewer::TriangleViewer(int argc, char** argv, size_t numTriangles, double maxAngle)
-    : Viewer()
     {
         instance_ = this;
 
@@ -114,18 +116,46 @@ namespace viewer
 
     auto TriangleViewer::keyboard(unsigned char key, int x, int y) -> void
     {
+        // Define 90 degrees in radians
+        constexpr double ninety          = 90 * M_PI / 180;
+
+        // Default to not recalculating the triangles unless one of the parameters is modified
+        bool recalcAngles = false;
+        bool recalcNumber = false;
+
         switch (key)
         {
             case 'a':
                 maxAngle_ -= 0.05;
+                recalcAngles = true;
                 break;
             case 'A':
                 maxAngle_ += 0.05;
+                recalcAngles = true;
+                break;
+
+            case 'b':
+                numTriangles_ -= 1;
+                recalcNumber = true;
+                break;
+            case 'B':
+                numTriangles_ += 1;
+                recalcNumber = true;
                 break;
         }
 
-        constexpr double ninety = 90 * M_PI / 180;
-        std::clamp(maxAngle_, 0.0, ninety);
+        if (recalcAngles)
+        {
+            // Clamp parameters to valid values and recalculate
+            maxAngle_  = std::clamp(maxAngle_, 0.05, ninety);
+            triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+        }
+        else
+        {
+            // TODO: Do NOT recalculate all triangles like a bozo
+            numTriangles_  = std::max(numTriangles_, 1ul);
+            triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+        }
     }
 
     auto TriangleViewer::computeCameraShift(int dx, int dy) -> void
@@ -201,5 +231,4 @@ namespace viewer
         camera_eye_z_ = vvz * vvnorm + camera_view_z_;
     }
 
-    Viewer* Viewer::instance_ = nullptr;
 }
