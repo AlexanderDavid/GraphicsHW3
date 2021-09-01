@@ -71,32 +71,41 @@ namespace triangle
     {
         std::vector<Triangle> triangles{};
         triangle::Triangle    triangle{
-            { 0, 0, 0 }, { -1, -1, 1 }, { 1, -1, 1 }, { drand48(), drand48(), drand48() }
+            { 0, 0, 0 }, { 0, 1.5, 0 }, { 0, 0.5, 0 }, { drand48(), drand48(), drand48() }
         };
 
         triangles.push_back(triangle);
 
         auto [point1, point2, point3] = triangle.points();
+        auto [edge1, edge2, edge3] = triangle.edgeVectors();
 
         for (size_t i = 0; i < numTriangles; i++)
         {
             while (true)
             {
-                Vector             random{ drand48() * 2, drand48() * 2, drand48() * 2 };
+                Vector             randomVector{ drand48() * 3, drand48() * 3, drand48() * 3 };
+                std::vector<Vector> vectors = { point1, point2, point3 };
+                std::random_shuffle(vectors.begin(), vectors.end());
+
                 triangle::Triangle newTriangle{
-                    point3 + random, point1, point2, { drand48(), drand48(), drand48() }
+                    vectors[0] + randomVector,
+                    vectors[1],
+                    vectors[2],
+                    { drand48(), drand48(), drand48() }
                 };
 
                 auto [edge1, edge2, edge3] = newTriangle.edgeVectors();
+
+                if (0 > std::acos(newTriangle.unitNormal().dot(triangle.unitNormal()))
+                    > maximumAngle)
+                    continue;
+                std::cout << "valid angles\n";
 
                 if (std::abs(edge1.norm()) > 2 || std::abs(edge1.norm()) < 1
                     || std::abs(edge2.norm()) > 2 || std::abs(edge2.norm()) < 1
                     || std::abs(edge3.norm()) > 2 || std::abs(edge3.norm()) < 1)
                     continue;
 
-                if (std::abs(std::acos(newTriangle.unitNormal().dot(triangle.unitNormal())))
-                    > maximumAngle)
-                    continue;
 
 
                 point1 = newTriangle.point1_;
