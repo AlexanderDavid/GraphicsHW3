@@ -73,8 +73,10 @@ namespace triangle
          *
          * @returns List of valid triangles
          * */
-        static auto generateTriangles(size_t numTriangles, double maximumAngle)
-            -> std::vector<Triangle>;
+        static auto generateTriangles(size_t numTriangles,
+                                      double maximumAngle,
+                                      int    minMag = 1,
+                                      int    maxMag = 2) -> std::vector<Triangle>;
 
     private:
         Point point1_;
