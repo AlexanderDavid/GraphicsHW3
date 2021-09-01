@@ -1,5 +1,6 @@
 #include "TriangleViewer.hh"
 
+#include <GL/freeglut_std.h>
 #include <GL/glut.h>
 #include <GL/gl.h>
 
@@ -30,23 +31,33 @@ namespace viewer
         camera_right_y_ = 0.0;
         camera_right_z_ = 0.0;
 
-        mouse_x_     = 0;
-        mouse_y_     = 0;
-        mouse_state_ = 0;
+        mouse_x_      = 0;
+        mouse_y_      = 0;
+        mouse_state_  = 0;
+        mouse_button_ = 0;
+        keystate_     = 0;
 
         current_raster_pos_[0] = 0;
         current_raster_pos_[1] = 0;
         current_raster_pos_[2] = 0;
         current_raster_pos_[3] = 0;
 
-        // Set up the viewer. Might make more sense to make TriangleViewer
-        // a subclass of the Viewer...
+        // Set up the viewer
         setup(&argc, argv);
 
         // Initialize all of the triangles
         numTriangles_ = numTriangles;
         maxAngle_     = maxAngle;
-        triangles_    = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
+        minMag_       = 1;
+        maxMag_       = 2;
+        if (argc == 1)
+        {
+            triangles_ = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
+        }
+        else if (argc == 2)
+        {
+            triangles_ = triangle::Triangle::generateTriangles(std::string(argv[1]));
+        }
     }
 
     auto TriangleViewer::display() -> void
@@ -98,64 +109,91 @@ namespace viewer
         glRasterPos2f(pos_x, pos_y);
 
         // Compute the amount the camera should move (stolen from starter code)
-        computeCameraShift(dx, dy);
+        if (mouse_button_ == GLUT_RIGHT_BUTTON && mouse_state_ == GLUT_DOWN)
+        {
+            camera_eye_x_ += static_cast<float>(dy);
+            camera_eye_y_ += static_cast<float>(dy);
+        }
+        else if (mouse_button_ == GLUT_MIDDLE_BUTTON && mouse_state_ == GLUT_DOWN)
+        {
+            camera_view_x_ += static_cast<float>(dx) * 0.1f;
+            camera_view_y_ += static_cast<float>(dy) * 0.1f;
+        }
+        else
+        {
+            computeCameraShift(dx, dy);
+        }
 
         // Set the mouse position
         mouse_x_ = x;
         mouse_y_ = y;
     }
 
-    auto TriangleViewer::mouse(int /*b*/, int state, int x, int y) -> void
+    auto TriangleViewer::mouse(int b, int state, int x, int y) -> void
     {
         // Update the mouse position
-        mouse_x_     = x;
-        mouse_y_     = y;
-        mouse_state_ = state;
+        mouse_x_      = x;
+        mouse_y_      = y;
+        mouse_state_  = state;
+        mouse_button_ = b;
+        keystate_     = glutGetModifiers();
         glGetFloatv(GL_CURRENT_RASTER_POSITION, current_raster_pos_);
     }
 
     auto TriangleViewer::keyboard(unsigned char key, int x, int y) -> void
     {
         // Define 90 degrees in radians
-        constexpr double ninety          = 90 * M_PI / 180;
+        constexpr double ninety = 90 * M_PI / 180;
 
-        // Default to not recalculating the triangles unless one of the parameters is modified
-        bool recalcAngles = false;
-        bool recalcNumber = false;
+        // Define variables for changing the triangle chain parameters
+        double deltaAngle  = 0;
+        int    deltaNumber = 0;
 
         switch (key)
         {
             case 'a':
-                maxAngle_ -= 0.05;
-                recalcAngles = true;
+                deltaAngle -= 0.05;
                 break;
             case 'A':
-                maxAngle_ += 0.05;
-                recalcAngles = true;
+                deltaAngle += 0.05;
                 break;
 
             case 'b':
-                numTriangles_ -= 1;
-                recalcNumber = true;
+                deltaNumber -= 1;
                 break;
             case 'B':
-                numTriangles_ += 1;
-                recalcNumber = true;
+                deltaNumber += 1;
+                break;
+
+            default:
                 break;
         }
 
-        if (recalcAngles)
+        if (deltaAngle != 0)
         {
             // Clamp parameters to valid values and recalculate
-            maxAngle_  = std::clamp(maxAngle_, 0.05, ninety);
-            triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+            auto newAngle = std::clamp(maxAngle_ + deltaAngle, 0.005, ninety);
+            if (newAngle != maxAngle_)
+            {
+                maxAngle_  = newAngle;
+                triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+            }
         }
-        else
+        else if (deltaNumber != 0)
         {
-            // TODO: Do NOT recalculate all triangles like a bozo
-            numTriangles_  = std::max(numTriangles_, 1ul);
-            triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+            if (deltaNumber == -1 && triangles_.size() > 1)
+            {
+                triangles_.pop_back();
+            }
+            else if (deltaNumber == 1)
+            {
+                triangles_.push_back(triangle::Triangle::generateTriangle(
+                    triangles_.back(), maxAngle_, minMag_, maxMag_));
+            }
         }
+
+        std::cout << "Maximum Angle:       " << maxAngle_ << "\n"
+                  << "Number of Triangles: " << triangles_.size() << "\n";
     }
 
     auto TriangleViewer::computeCameraShift(int dx, int dy) -> void

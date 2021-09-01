@@ -66,6 +66,8 @@ namespace viewer
 
         size_t                          numTriangles_;
         double                          maxAngle_;
+        int                             minMag_;
+        int                             maxMag_;
         std::vector<triangle::Triangle> triangles_;
 
         float camera_fov_;
@@ -92,6 +94,8 @@ namespace viewer
         int   mouse_x_;
         int   mouse_y_;
         int   mouse_state_;
+        int   mouse_button_;
+        int   keystate_;
         float current_raster_pos_[4];
     };
 }
