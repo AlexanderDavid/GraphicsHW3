@@ -1,3 +1,8 @@
+/**
+ * @file TriangleViewer.hh
+ * @brief A wrapper around OpenGL to display a series of triangles
+ **/
+
 #ifndef TRIANGLE_VIEWER_HPP
 #define TRIANGLE_VIEWER_HPP
 
@@ -8,9 +13,14 @@
 #include <memory>
 #include <vector>
 
-namespace triangleviewer
+namespace viewer
 {
-    class TriangleViewer : public std::enable_shared_from_this<TriangleViewer>
+    /**
+     * A wrapper around the OpenGL wrapper that displays a series of triangles. Each triangle is
+     * linked to the next along an edge. The angle between two touching triangles is also limited
+     * based on a parameter
+     */
+    class TriangleViewer : public Viewer
     {
     public:
         /**
@@ -24,14 +34,6 @@ namespace triangleviewer
          **/
         TriangleViewer(int argc, char** argv, size_t numTriangles, double maxAngle);
 
-        /**
-         * Static functions that use the "singleton" instance to call the class methods used
-         * for the OpenGL callbacks
-         **/
-        static auto displayCb() -> void { instance_->display(); }
-        static auto resizeCb(int width, int height) -> void { instance_->resize(width, height); }
-        static auto motionCb(int x, int y) -> void { instance_->motion(x, y); }
-        static auto mouseCb(int b, int state, int x, int y) -> void { instance_->mouse(b, state, x, y); };
 
         /**
          * Add a triangle to the scene
@@ -40,21 +42,16 @@ namespace triangleviewer
          **/
         auto add(triangle::Triangle& triangle) -> void { triangles_.push_back(triangle); };
 
-        /**
-         * Start the OpenGL main loop. Blocking call
-         **/
-        auto go() -> void { vwr_.go(); }
-
     private:
         /**
          * Class level openGL callbacks. These contain the actual callback code that will be called
          * by the static methods
          **/
-        auto display() -> void;
-        auto resize(int width, int height) -> void;
-        auto motion(int x, int y) -> void;
-        auto mouse(int b, int state, int x, int y) -> void;
-        auto keyboard(unsigned char key, int x, int y) -> void;
+        auto display() -> void override;
+        auto resize(int width, int height) -> void override;
+        auto motion(int x, int y) -> void override;
+        auto mouse(int b, int state, int x, int y) -> void override;
+        auto keyboard(unsigned char key, int x, int y) -> void override;
 
         /**
          * Compute the shift in the camera point of view that is induced by moving the mouse
@@ -67,9 +64,8 @@ namespace triangleviewer
          * */
         auto computeCameraShift(int dx, int dy) -> void;
 
-        static viewer::Viewer  vwr_;
-        static TriangleViewer* instance_;
-
+        size_t                          numTriangles_;
+        double                          maxAngle_;
         std::vector<triangle::Triangle> triangles_;
 
         float camera_fov_;
