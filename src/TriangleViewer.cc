@@ -5,10 +5,12 @@
 
 namespace triangleviewer
 {
-    TriangleViewer::TriangleViewer(int argc, char** argv)
+    TriangleViewer::TriangleViewer(int argc, char** argv, size_t numTriangles, double maxAngle)
     {
+        // Set the instance for the static OpenGL callbacks :(
         TriangleViewer::instance_ = this;
 
+        // Initializ OpenGL viewport instance variables
         camera_fov_     = 35.0;
         camera_aspect_  = 1.0;
         camera_near_    = 0.01;
@@ -35,17 +37,24 @@ namespace triangleviewer
         current_raster_pos_[2] = 0;
         current_raster_pos_[3] = 0;
 
+        // Set up the viewer. Might make more sense to make TriangleViewer
+        // a subclass of the Viewer...
         vwr_.setup(&argc, argv);
-
         vwr_.setDisplayCallback(&displayCb);
         vwr_.setReshapeCallback(&resizeCb);
         vwr_.setMotionCallback(&motionCb);
         vwr_.setMouseCallback(&mouseCb);
+
+        // Initialize all of the triangles
+        triangles_ = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
     }
 
     auto TriangleViewer::display() -> void
     {
+        // Clear the buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Setup the camera
         glLoadIdentity();
         gluPerspective(camera_fov_, camera_aspect_, camera_near_, camera_far_);
         gluLookAt(camera_eye_x_,
@@ -58,29 +67,29 @@ namespace triangleviewer
                   camera_up_y_,
                   camera_up_z_  // Camera up direction
         );
-
         glEnable(GL_DEPTH_TEST);
         glDepthRange(camera_near_, camera_far_);
 
+        // Draw all of the objects in the scene
         for (auto& triangle : triangles_)
         {
             triangle.draw();
         }
 
+        // Swap the buffer to display the image
         glutSwapBuffers();
         glutPostRedisplay();
     }
 
     auto TriangleViewer::resize(int width, int height) -> void
     {
-        glViewport(
-            0, 0, width, height);  // If you have a reshape function, you MUST call glViewport!
-        // TODO: INSERT ANY OTHER CODE TO ACCOUNT FOR WINDOW SIZE (maybe set projection here).
-        printf("Reshaped to width %d, height %d\n", width, height);
+        // Reshape the image
+        glViewport(0, 0, width, height);
     }
 
     auto TriangleViewer::motion(int x, int y) -> void
     {
+        // Update the mouse position
         glGetFloatv(GL_CURRENT_RASTER_POSITION, current_raster_pos_);
         int   dx    = x - mouse_x_;
         int   dy    = y - mouse_y_;
@@ -88,14 +97,17 @@ namespace triangleviewer
         float pos_y = current_raster_pos_[1] - static_cast<float>(dy);
         glRasterPos2f(pos_x, pos_y);
 
+        // Compute the amount the camera should move (stolen from starter code)
         computeCameraShift(dx, dy);
 
+        // Set the mouse position
         mouse_x_ = x;
         mouse_y_ = y;
     }
 
     auto TriangleViewer::mouse(int /*b*/, int state, int x, int y) -> void
     {
+        // Update the mouse position
         mouse_x_     = x;
         mouse_y_     = y;
         mouse_state_ = state;
@@ -104,9 +116,9 @@ namespace triangleviewer
 
     auto TriangleViewer::computeCameraShift(int dx, int dy) -> void
     {
+        // Stolen from starter code
         // dx --> rotation around y axis
         // dy --> rotation about camera right axis
-
         float vvx    = camera_eye_x_ - camera_view_x_;
         float vvy    = camera_eye_y_ - camera_view_y_;
         float vvz    = camera_eye_z_ - camera_view_z_;
@@ -117,7 +129,7 @@ namespace triangleviewer
 
 
         // Rotate around y axis
-        //      Rotate view direction
+        // Rotate view direction
         float cosx      = std::cos(-dx * 0.006);
         float sinx      = std::sin(-dx * 0.006);
         float nvvx      = vvx * cosx + vvz * sinx;
@@ -128,7 +140,8 @@ namespace triangleviewer
         vvz             = nvvz;
         camera_right_x_ = nrightx;
         camera_right_z_ = nrightz;
-        //      Rotate up direction
+
+        // Rotate up direction
         float crossx = camera_up_z_;
         float crossy = 0.0;
         float crossz = -camera_up_x_;
@@ -136,7 +149,8 @@ namespace triangleviewer
         camera_up_x_ = camera_up_x_ * cosx + crossx * sinx;
         camera_up_y_ = camera_up_y_ * cosx + ydotup * (1.0 - cosx) + crossy * sinx;
         camera_up_z_ = camera_up_z_ * cosx + crossz * sinx;
-        //      Rotate right direction
+
+        // Rotate right direction
         crossx          = camera_right_z_;
         crossy          = 0.0;
         crossz          = -camera_right_x_;
@@ -145,9 +159,8 @@ namespace triangleviewer
         camera_right_y_ = camera_right_y_ * cosx + ydotup * (1.0 - cosx) + crossy * sinx;
         camera_right_z_ = camera_right_z_ * cosx + crossz * sinx;
 
-
         // Rotate around camera-right axis
-        //     Rotate view direction
+        // Rotate view direction
         cosx               = std::cos(dy * 0.006);
         sinx               = std::sin(dy * 0.006);
         float rightdotview = camera_right_x_ * vvx + camera_right_y_ * vvy + camera_right_z_ * vvz;
@@ -160,14 +173,14 @@ namespace triangleviewer
         vvx        = nvvx;
         vvy        = nvvy;
         vvz        = nvvz;
-        //      Rotate up direction
+
+        // Rotate up direction
         crossx       = camera_right_y_ * camera_up_z_ - camera_right_z_ * camera_up_y_;
         crossy       = camera_right_z_ * camera_up_x_ - camera_right_x_ * camera_up_z_;
         crossz       = camera_right_x_ * camera_up_y_ - camera_right_y_ * camera_up_x_;
         camera_up_x_ = camera_up_x_ * cosx + crossx * sinx;
         camera_up_y_ = camera_up_y_ * cosx + crossy * sinx;
         camera_up_z_ = camera_up_z_ * cosx + crossz * sinx;
-
 
         camera_eye_x_ = vvx * vvnorm + camera_view_x_;
         camera_eye_y_ = vvy * vvnorm + camera_view_y_;
