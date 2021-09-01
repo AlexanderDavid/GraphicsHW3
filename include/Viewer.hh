@@ -2,24 +2,26 @@
 #define VIEWER_HPP
 
 #include <functional>
+#include <mutex>
+
+#include <GL/glut.h>
 
 namespace viewer
 {
     class Viewer
     {
     public:
-        static auto getInstance(int* argc, char** argv) -> Viewer&
-        {
-            static Viewer instance{ argc, argv };
+        static auto setup(int* argc, char** argv) -> void;
 
-            return instance;
-        }
+        static auto setDisplayCallback(void (*fn)()) -> void;
+        static auto setReshapeCallback(void (*fn)(int, int)) -> void;
+        static auto setMotionCallback(void (*fn)(int, int)) -> void;
+        static auto setMouseCallback(void (*fn)(int, int, int, int)) -> void;
 
-        auto setDisplayCallback(void (*fn)()) -> void;
-        auto setReshapeCallback(void (*fn)(int, int)) -> void;
+        static auto go() { glutMainLoop(); }
 
     private:
-        Viewer(int* argc, char** argv);
+        static std::once_flag flag_;
     };
 }
 
