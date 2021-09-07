@@ -37,26 +37,26 @@ namespace camera
          * */
         auto computeCameraShift(int dx, int dy) -> void;
 
-        float camera_fov_;
-        float camera_aspect_;
-        float camera_near_;
-        float camera_far_;
+        float fov_;
+        float aspect_;
+        float near_;
+        float far_;
 
-        float camera_eye_x_;
-        float camera_eye_y_;
-        float camera_eye_z_;
+        float eye_x_;
+        float eye_y_;
+        float eye_z_;
 
-        float camera_view_x_;
-        float camera_view_y_;
-        float camera_view_z_;
+        float view_x_;
+        float view_y_;
+        float view_z_;
 
-        float camera_up_x_;
-        float camera_up_y_;
-        float camera_up_z_;
+        float up_x_;
+        float up_y_;
+        float up_z_;
 
-        float camera_right_x_;
-        float camera_right_y_;
-        float camera_right_z_;
+        float right_x_;
+        float right_y_;
+        float right_z_;
 
         Mouse mouse_;
         int   mouse_x_;
