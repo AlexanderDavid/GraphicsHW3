@@ -75,7 +75,7 @@ namespace triangle
         std::vector<Triangle> triangles{};
 
         // Define a base triangle that is valid.
-        triangle::Triangle    triangle{
+        triangle::Triangle triangle{
             { 0, 0, 0 }, { 0, 1.5, 0 }, { 0, 0.5, 0 }, { drand48(), drand48(), drand48() }
         };
         triangles.push_back(triangle);

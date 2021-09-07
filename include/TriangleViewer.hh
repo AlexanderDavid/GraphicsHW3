@@ -8,6 +8,7 @@
 
 #include "Viewer.hh"
 #include "Triangle.hh"
+#include "Camera.hh"
 
 #include <GL/freeglut_std.h>
 #include <memory>
@@ -53,46 +54,11 @@ namespace viewer
         auto mouse(int b, int state, int x, int y) -> void override;
         auto keyboard(unsigned char key, int x, int y) -> void override;
 
-        /**
-         * Compute the shift in the camera point of view that is induced by moving the mouse
-         *
-         * TODO: This should return a struct rather than changing the data members. Or change the
-         *       function name
-         *
-         * @param dx Change in mouse X
-         * @param dy Change in mouse Y
-         * */
-        auto computeCameraShift(int dx, int dy) -> void;
-
         size_t                          numTriangles_;
         double                          maxAngle_;
         std::vector<triangle::Triangle> triangles_;
 
-        float camera_fov_;
-        float camera_aspect_;
-        float camera_near_;
-        float camera_far_;
-
-        float camera_eye_x_;
-        float camera_eye_y_;
-        float camera_eye_z_;
-
-        float camera_view_x_;
-        float camera_view_y_;
-        float camera_view_z_;
-
-        float camera_up_x_;
-        float camera_up_y_;
-        float camera_up_z_;
-
-        float camera_right_x_;
-        float camera_right_y_;
-        float camera_right_z_;
-
-        int   mouse_x_;
-        int   mouse_y_;
-        int   mouse_state_;
-        float current_raster_pos_[4];
+        camera::Camera camera_;
     };
 }
 

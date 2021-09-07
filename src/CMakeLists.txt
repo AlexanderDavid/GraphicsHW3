@@ -10,7 +10,9 @@ add_library(hw1_lib
     "../include/Viewer.hh"
     Viewer.cc
     "../include/TriangleViewer.hh"
-    TriangleViewer.cc)
+    TriangleViewer.cc
+    "../include/Camera.hh"
+    Camera.cc)
 add_library(hw1::lib ALIAS hw1_lib)
 target_link_libraries(hw1_lib PUBLIC
   Eigen3::Eigen
