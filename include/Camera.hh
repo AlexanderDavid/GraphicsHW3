@@ -29,18 +29,32 @@ namespace camera
          * */
         auto computeCameraShift(int dx, int dy) -> void;
 
-        float fov_;
-        float aspect_;
-        float near_;
-        float far_;
+        float camera_fov_;
+        float camera_aspect_;
+        float camera_near_;
+        float camera_far_;
 
-        Eigen::Vector3f camera_eye_;
-        Eigen::Vector3f camera_view_;
-        Eigen::Vector3f camera_up_;
-        Eigen::Vector3f camera_right_;
+        float camera_eye_x_;
+        float camera_eye_y_;
+        float camera_eye_z_;
 
-        Eigen::Vector2i mouse_;
-        int mouse_state_;
+        float camera_view_x_;
+        float camera_view_y_;
+        float camera_view_z_;
+
+        float camera_up_x_;
+        float camera_up_y_;
+        float camera_up_z_;
+
+        float camera_right_x_;
+        float camera_right_y_;
+        float camera_right_z_;
+
+        int   mouse_x_;
+        int   mouse_y_;
+        int   mouse_state_;
+        int   mouse_button_;
+        int   keystate_;
         float current_raster_pos_[4];
     };
 
