@@ -2,6 +2,7 @@
 #define CAMREA_HH
 
 #include <Eigen/Dense>
+#include <Eigen/src/Core/Matrix.h>
 
 namespace camera
 {
@@ -42,27 +43,12 @@ namespace camera
         float near_;
         float far_;
 
-        float eye_x_;
-        float eye_y_;
-        float eye_z_;
-
-        float view_x_;
-        float view_y_;
-        float view_z_;
-
-        float up_x_;
-        float up_y_;
-        float up_z_;
-
-        float right_x_;
-        float right_y_;
-        float right_z_;
+        Eigen::Vector3f eye_;
+        Eigen::Vector3f view_;
+        Eigen::Vector3f up_;
+        Eigen::Vector3f right_;
 
         Mouse mouse_;
-        int   mouse_x_;
-        int   mouse_y_;
-        int   mouse_state_;
-        int   mouse_button_;
         int   keystate_;
         float current_raster_pos_[4];
     };
