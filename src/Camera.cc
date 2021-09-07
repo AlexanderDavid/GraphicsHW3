@@ -24,11 +24,7 @@ namespace camera
         camera_right_y_ = 0.0;
         camera_right_z_ = 0.0;
 
-        mouse_x_      = 0;
-        mouse_y_      = 0;
-        mouse_state_  = 0;
-        mouse_button_ = 0;
-        keystate_     = 0;
+        keystate_ = 0;
 
         current_raster_pos_[0] = 0;
         current_raster_pos_[1] = 0;
@@ -58,8 +54,8 @@ namespace camera
     {
         // Update the mouse position
         glGetFloatv(GL_CURRENT_RASTER_POSITION, current_raster_pos_);
-        int   dx    = x - mouse_x_;
-        int   dy    = y - mouse_y_;
+        int   dx    = x - mouse_.x;
+        int   dy    = y - mouse_.y;
         float pos_x = current_raster_pos_[0] + static_cast<float>(dx);
         float pos_y = current_raster_pos_[1] - static_cast<float>(dy);
         glRasterPos2f(pos_x, pos_y);
@@ -67,17 +63,17 @@ namespace camera
         computeCameraShift(dx, dy);
 
         // Set the mouse position
-        mouse_x_ = x;
-        mouse_y_ = y;
+        mouse_.x = x;
+        mouse_.y = y;
     }
 
     auto Camera::mouse(int b, int state, int x, int y) -> void
     {
         // Update the mouse position
-        mouse_x_      = x;
-        mouse_y_      = y;
-        mouse_state_  = state;
-        mouse_button_ = b;
+        mouse_.x      = x;
+        mouse_.y      = y;
+        mouse_.state  = state;
+        mouse_.button = b;
         keystate_     = glutGetModifiers();
         glGetFloatv(GL_CURRENT_RASTER_POSITION, current_raster_pos_);
     }

@@ -5,6 +5,14 @@
 
 namespace camera
 {
+    struct Mouse
+    {
+        int x      = 0;
+        int y      = 0;
+        int state  = 0;
+        int button = 0;
+    };
+
     class Camera
     {
     public:
@@ -50,6 +58,7 @@ namespace camera
         float camera_right_y_;
         float camera_right_z_;
 
+        Mouse mouse_;
         int   mouse_x_;
         int   mouse_y_;
         int   mouse_state_;
@@ -57,6 +66,7 @@ namespace camera
         int   keystate_;
         float current_raster_pos_[4];
     };
+
 
 }
 
