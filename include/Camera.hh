@@ -6,6 +6,9 @@
 
 namespace camera
 {
+    /**
+     * Object to keep track of the current mouse state
+     **/
     struct Mouse
     {
         int x      = 0;
@@ -14,9 +17,15 @@ namespace camera
         int button = 0;
     };
 
+    /**
+     * Camera control class with logic stolen from the starter code
+     **/
     class Camera
     {
     public:
+        /**
+         * Construct Camera object with sane FOV, aspect ratio, etc.
+         **/
         Camera();
 
         /**
@@ -52,8 +61,6 @@ namespace camera
         int   keystate_;
         float current_raster_pos_[4];
     };
-
-
 }
 
 #endif  // CAMERA_HH

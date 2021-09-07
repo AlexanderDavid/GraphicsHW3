@@ -6,19 +6,20 @@ namespace camera
 {
     Camera::Camera()
     {
-        // Initialize OpenGL viewport instance variables
+        // Initialize basic camera parameters
         fov_    = 35.0;
         aspect_ = 1.0;
         near_   = 0.01;
         far_    = 100000.0;
 
+        // Initialize camera facing
         eye_   = { 0, 0, -15 };
         view_  = { 0, 0, 0 };
         up_    = { 0, 1, 0 };
         right_ = { 1, 0, 0 };
 
-        keystate_ = 0;
-
+        // Initialize stateful variables for keyboard and mouse
+        keystate_              = 0;
         current_raster_pos_[0] = 0;
         current_raster_pos_[1] = 0;
         current_raster_pos_[2] = 0;
@@ -27,6 +28,7 @@ namespace camera
 
     auto Camera::display() -> void
     {
+        // Change camera to calculated paramters
         glLoadIdentity();
         gluPerspective(fov_, aspect_, near_, far_);
         gluLookAt(eye_.x(),
@@ -53,9 +55,10 @@ namespace camera
         float pos_y = current_raster_pos_[1] - static_cast<float>(dy);
         glRasterPos2f(pos_x, pos_y);
 
+        // Compute the shift
         computeCameraShift(dx, dy);
 
-        // Set the mouse position
+        // Update the mouse position
         mouse_.x = x;
         mouse_.y = y;
     }
@@ -83,7 +86,6 @@ namespace camera
         vvx /= vvnorm;
         vvy /= vvnorm;
         vvz /= vvnorm;
-
 
         // Rotate around y axis
         // Rotate view direction
