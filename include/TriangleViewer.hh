@@ -56,6 +56,8 @@ namespace viewer
 
         size_t                          numTriangles_;
         double                          maxAngle_;
+        int                             minMag_;
+        int                             maxMag_;
         std::vector<triangle::Triangle> triangles_;
 
         camera::Camera camera_;

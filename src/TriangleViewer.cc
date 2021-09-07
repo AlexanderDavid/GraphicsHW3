@@ -1,5 +1,6 @@
 #include "TriangleViewer.hh"
 
+#include <GL/freeglut_std.h>
 #include <GL/glut.h>
 #include <GL/gl.h>
 
@@ -20,7 +21,16 @@ namespace viewer
         // Initialize all of the triangles
         numTriangles_ = numTriangles;
         maxAngle_     = maxAngle;
-        triangles_    = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
+        minMag_       = 1;
+        maxMag_       = 2;
+        if (argc == 1)
+        {
+            triangles_ = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
+        }
+        else if (argc == 2)
+        {
+            triangles_ = triangle::Triangle::generateTriangles(std::string(argv[1]));
+        }
     }
 
     auto TriangleViewer::display() -> void
@@ -65,42 +75,54 @@ namespace viewer
         // Define 90 degrees in radians
         constexpr double ninety = 90 * M_PI / 180;
 
-        // Default to not recalculating the triangles unless one of the parameters is modified
-        bool recalcAngles = false;
-        bool recalcNumber = false;
+        // Define variables for changing the triangle chain parameters
+        double deltaAngle  = 0;
+        int    deltaNumber = 0;
 
         switch (key)
         {
             case 'a':
-                maxAngle_ -= 0.05;
-                recalcAngles = true;
+                deltaAngle -= 0.05;
                 break;
             case 'A':
-                maxAngle_ += 0.05;
-                recalcAngles = true;
+                deltaAngle += 0.05;
                 break;
 
             case 'b':
-                numTriangles_ -= 1;
-                recalcNumber = true;
+                deltaNumber -= 1;
                 break;
             case 'B':
-                numTriangles_ += 1;
-                recalcNumber = true;
+                deltaNumber += 1;
+                break;
+
+            default:
                 break;
         }
 
-        if (recalcAngles)
+        if (deltaAngle != 0)
         {
             // Clamp parameters to valid values and recalculate
-            maxAngle_  = std::clamp(maxAngle_, 0.05, ninety);
-            triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+            auto newAngle = std::clamp(maxAngle_ + deltaAngle, 0.005, ninety);
+            if (newAngle != maxAngle_)
+            {
+                maxAngle_  = newAngle;
+                triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+            }
         }
-        else
+        else if (deltaNumber != 0)
         {
-            // TODO: Do NOT recalculate all triangles like a bozo
-            numTriangles_ = std::max(numTriangles_, 1ul);
-            triangles_    = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+            if (deltaNumber == -1 && triangles_.size() > 1)
+            {
+                triangles_.pop_back();
+            }
+            else if (deltaNumber == 1)
+            {
+                triangles_.push_back(triangle::Triangle::generateTriangle(
+                    triangles_.back(), maxAngle_, minMag_, maxMag_));
+            }
         }
+
+        std::cout << "Maximum Angle:       " << maxAngle_ << "\n"
+                  << "Number of Triangles: " << triangles_.size() << "\n";
     }
 }
