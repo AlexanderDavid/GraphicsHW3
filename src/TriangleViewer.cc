@@ -25,11 +25,11 @@ namespace viewer
         maxMag_       = 2;
         if (argc == 1)
         {
-            triangles_ = triangle::Triangle::generateTriangles(numTriangles, maxAngle);
+            triangles_ = triangle::generateTriangles(numTriangles, maxAngle);
         }
         else if (argc == 2)
         {
-            triangles_ = triangle::Triangle::generateTriangles(std::string(argv[1]));
+            triangles_ = triangle::generateTriangles(std::string(argv[1]));
         }
 
         // Display the usage
@@ -108,7 +108,7 @@ namespace viewer
             if (newAngle != maxAngle_)
             {
                 maxAngle_  = newAngle;
-                triangles_ = triangle::Triangle::generateTriangles(numTriangles_, maxAngle_);
+                triangles_ = triangle::generateTriangles(numTriangles_, maxAngle_);
             }
         }
         else if (deltaNumber != 0)
@@ -119,7 +119,7 @@ namespace viewer
             }
             else if (deltaNumber == 1)
             {
-                triangles_.push_back(triangle::Triangle::generateTriangle(
+                triangles_.push_back(triangle::generateTriangle(
                     triangles_.back(), maxAngle_, minMag_, maxMag_));
             }
         }

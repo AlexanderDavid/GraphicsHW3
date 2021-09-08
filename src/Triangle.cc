@@ -70,7 +70,7 @@ namespace triangle
         glEnd();
     }
 
-    auto Triangle::generateTriangles(std::string stlFile) -> std::vector<Triangle>
+    auto generateTriangles(std::string stlFile) -> std::vector<Triangle>
     {
         std::string   line;
         std::ifstream file{ stlFile };
@@ -111,10 +111,11 @@ namespace triangle
         return triangles;
     }
 
-    auto Triangle::generateTriangles(size_t numTriangles,
-                                     double maximumAngle,
-                                     int    minMag,
-                                     int    maxMag) -> std::vector<Triangle>
+
+    auto generateTriangles(size_t numTriangles,
+                                    double maximumAngle,
+                                    int    minMag,
+                                    int    maxMag) -> std::vector<Triangle>
     {
         // Define a vector to store valid triangles
         std::vector<Triangle> triangles{};
@@ -146,8 +147,7 @@ namespace triangle
         return triangles;
     }
 
-
-    auto Triangle::generateTriangle(const Triangle& triangle,
+    auto generateTriangle(const Triangle& triangle,
                                     double          maximumAngle,
                                     int             minMag,
                                     int             maxMag) -> Triangle
@@ -159,7 +159,8 @@ namespace triangle
             Vector randomVector{ drand48() * 3, drand48() * 3, drand48() * 3 };
 
             // Shuffle the points of the old triangle
-            std::vector<Vector> points = { triangle.point1_, triangle.point2_, triangle.point3_ };
+            auto [point1, point2, point3] = triangle.points();
+            std::vector<Vector> points = { point1, point2, point3 };
             std::shuffle(points.begin(), points.end(), std::mt19937(std::random_device()()));
 
             // Define a new triangle that shares two random points with the old triangle but
@@ -183,4 +184,5 @@ namespace triangle
             return newTriangle;
         }
     }
+
 }

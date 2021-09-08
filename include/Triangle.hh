@@ -64,38 +64,6 @@ namespace triangle
          **/
         auto draw() const -> const void;
 
-        static auto generateTriangles(std::string stlFile) -> std::vector<Triangle>;
-
-        /**
-         * Generate triangles according to the project handout
-         *
-         * @param numTriangles Number of triangles to generate
-         * @param maximumAngles Maximum angle between the normal vectors of two
-         *                      touching triangles
-         * @param minMag the minimum magnitude of any edge
-         * @param maxMag the maximum magnitude of any edge
-         *
-         * @returns List of valid triangles
-         * */
-        static auto generateTriangles(size_t numTriangles,
-                                      double maximumAngle,
-                                      int    minMag = 1,
-                                      int    maxMag = 2) -> std::vector<Triangle>;
-
-        /**
-         * Generate a single triangle based on the previous traingle and constraints from the
-         * project handout
-         *
-         * @param triangle Previous triangle in the chain
-         * @param maximumAngles Maximum angle between the normal vectors of two
-         *                      touching triangles
-         * @param minMag the minimum magnitude of any edge
-         * @param maxMag the maximum magnitude of any edge
-         * */
-        static auto generateTriangle(const Triangle& triangle,
-                                     double          maximumAngle,
-                                     int             minMag,
-                                     int             maxMag) -> Triangle;
 
     private:
         Point point1_;
@@ -103,6 +71,46 @@ namespace triangle
         Point point3_;
         Color color_;
     };
+
+    /**
+     * Generate triangles from an stl file (ignoring normals) with random colors
+     *
+     * @param stlFile path to STL file
+     *
+     * @returns List of triangles from the STL file
+     **/
+    auto generateTriangles(std::string stlFile) -> std::vector<Triangle>;
+
+    /**
+     * Generate triangles according to the project handout
+     *
+     * @param numTriangles Number of triangles to generate
+     * @param maximumAngles Maximum angle between the normal vectors of two
+     *                      touching triangles
+     * @param minMag the minimum magnitude of any edge
+     * @param maxMag the maximum magnitude of any edge
+     *
+     * @returns List of valid triangles
+     **/
+    auto generateTriangles(size_t numTriangles,
+                                    double maximumAngle,
+                                    int    minMag = 1,
+                                    int    maxMag = 2) -> std::vector<Triangle>;
+
+    /**
+     * Generate a single triangle based on the previous traingle and constraints from the
+     * project handout
+     *
+     * @param triangle Previous triangle in the chain
+     * @param maximumAngles Maximum angle between the normal vectors of two
+     *                      touching triangles
+     * @param minMag the minimum magnitude of any edge
+     * @param maxMag the maximum magnitude of any edge
+     **/
+    auto generateTriangle(const Triangle& triangle,
+                                    double          maximumAngle,
+                                    int             minMag,
+                                    int             maxMag) -> Triangle;
 
 }
 
