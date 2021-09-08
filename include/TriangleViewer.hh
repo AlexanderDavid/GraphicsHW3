@@ -36,7 +36,7 @@ namespace viewer
          *
          * @param triangle Triangle to add
          **/
-        auto add(triangle::Triangle& triangle) -> void { triangles_.push_back(triangle); };
+        auto add(const triangle::Triangle& triangle) -> void { triangles_.push_back(triangle); };
 
     private:
         /**
@@ -52,7 +52,7 @@ namespace viewer
         /**
          * Print usage to stdout
          **/
-        auto usage() -> void;
+        auto usage() const -> void;
 
         size_t                          numTriangles_;
         double                          maxAngle_;
