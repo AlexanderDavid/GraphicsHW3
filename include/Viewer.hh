@@ -1,5 +1,5 @@
-#ifndef VIEWER_HPP
-#define VIEWER_HPP
+#ifndef VIEWER_HH
+#define VIEWER_HH
 
 #include <functional>
 #include <mutex>
@@ -62,4 +62,4 @@ namespace viewer
     };
 }
 
-#endif  // VIEWER_HPP
+#endif  // VIEWER_HH

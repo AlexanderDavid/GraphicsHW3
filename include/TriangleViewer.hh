@@ -1,10 +1,5 @@
-/**
- * @file TriangleViewer.hh
- * @brief A wrapper around OpenGL to display a series of triangles
- **/
-
-#ifndef TRIANGLE_VIEWER_HPP
-#define TRIANGLE_VIEWER_HPP
+#ifndef TRIANGLE_VIEWER_HH
+#define TRIANGLE_VIEWER_HH
 
 #include "Viewer.hh"
 #include "Triangle.hh"
@@ -69,4 +64,4 @@ namespace viewer
     };
 }
 
-#endif  // TRIANGLE_VIEWER_HPP
+#endif  // TRIANGLE_VIEWER_HH

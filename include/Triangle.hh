@@ -1,5 +1,5 @@
-#ifndef TRIANGLE_HPP
-#define TRIANGLE_HPP
+#ifndef TRIANGLE_HH
+#define TRIANGLE_HH
 
 #include <tuple>
 
@@ -114,4 +114,4 @@ namespace triangle
 
 }
 
-#endif  // TRIANGLE_HPP
+#endif  // TRIANGLE_HH
