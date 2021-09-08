@@ -31,6 +31,9 @@ namespace viewer
         {
             triangles_ = triangle::Triangle::generateTriangles(std::string(argv[1]));
         }
+
+        // Display the usage
+        usage();
     }
 
     auto TriangleViewer::display() -> void
@@ -60,10 +63,7 @@ namespace viewer
         glViewport(0, 0, width, height);
     }
 
-    auto TriangleViewer::motion(int x, int y) -> void
-    {
-        camera_.motion(x, y);
-    }
+    auto TriangleViewer::motion(int x, int y) -> void { camera_.motion(x, y); }
 
     auto TriangleViewer::mouse(int b, int state, int x, int y) -> void
     {
@@ -94,7 +94,9 @@ namespace viewer
             case 'B':
                 deltaNumber += 1;
                 break;
-
+            case 'h':
+                usage();
+                break;
             default:
                 break;
         }
@@ -122,7 +124,19 @@ namespace viewer
             }
         }
 
-        std::cout << "Maximum Angle:       " << maxAngle_ << "\n"
-                  << "Number of Triangles: " << triangles_.size() << "\n";
+        if (deltaNumber != 0 || deltaAngle != 0)
+        {
+            std::cout << "Maximum Angle:       " << maxAngle_ << "\n"
+                      << "Number of Triangles: " << triangles_.size() << "\n\n";
+        }
+    }
+
+    auto TriangleViewer::usage() -> void
+    {
+        std::cout << "A - Increase Maximum Angle\n"
+                  << "a - Decrease Maximum Angle\n"
+                  << "B - Increase number of triangles\n"
+                  << "b - Decrease number of triangles\n"
+                  << "h - Print this usage\n";
     }
 }

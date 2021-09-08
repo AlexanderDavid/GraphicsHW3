@@ -54,6 +54,11 @@ namespace viewer
         auto mouse(int b, int state, int x, int y) -> void override;
         auto keyboard(unsigned char key, int x, int y) -> void override;
 
+        /**
+         * Print usage to stdout
+         **/
+        auto usage() -> void;
+
         size_t                          numTriangles_;
         double                          maxAngle_;
         int                             minMag_;
