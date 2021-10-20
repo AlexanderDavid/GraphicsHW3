@@ -1,25 +1,14 @@
 #include <GL/glut.h>
 
-#include "TriangleViewer.hh"
-#include "Triangle.hh"
-
-#include <cstdlib>
-#include <iostream>
-#include <memory>
-
+#include "NGon.hh"
+#include "NGonViewer.hh"
 
 auto main(int argc, char** argv) -> int
 {
-    // Initialize the prng
-    srand48(19581623);
-
-    // Variables from the project handout
-    constexpr auto numTriangles = 30;
-    constexpr auto maxAngle     = 30 * M_PI / 180;
-
     // Initialize and start (blocking) the triangle viewer
-    auto tv = viewer::TriangleViewer(argc, argv, numTriangles, maxAngle);
-    tv.go();
+    auto nv = viewer::NGonViewer(argc, argv);
+    nv.set(ngon::generateSymmetricNGon(500, 5, 5, {0, 1, 0}, {0, 0, 0}, 5));
+    viewer::NGonViewer::go();
 
     return 0;
 }

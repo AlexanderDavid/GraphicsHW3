@@ -4,14 +4,16 @@ find_package(GLUT REQUIRED)
 
 
 add_library(hw1_lib
-    "../include/Triangle.hh"
-    Triangle.cc
-    "../include/Viewer.hh"
+        "../include/Viewer.hh"
     Viewer.cc
-    "../include/TriangleViewer.hh"
-    TriangleViewer.cc
-    "../include/Camera.hh"
-    Camera.cc)
+        "../include/Camera.hh"
+    Camera.cc
+    "../include/NGon.hh"
+    NGon.cc
+    "../include/Face.hh"
+    Face.cc
+    "../include/NGonViewer.hh"
+        NGonViewer.cc)
 add_library(hw1::lib ALIAS hw1_lib)
 target_link_libraries(hw1_lib PUBLIC
   Eigen3::Eigen
