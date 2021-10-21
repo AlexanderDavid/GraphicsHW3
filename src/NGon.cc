@@ -65,27 +65,29 @@ namespace ngon
     {
         for (auto face : faces_)
         {
+            std::cout << textureCoords_.size() << "\n";
             glBegin(GL_POLYGON);
             for (int i = 0; i < face.size(); i++)
             {
                 //            glColor3d(0.51, 0.81, 0.51);
                 auto [vi, ni, ti] = face.getVertex(i);
-                auto color = generateColor(textureCoords_[ti]);
+                auto color = generateColor(textureCoords_[ti % textureCoords_.size()]);
                 glColor3d(color.x(), color.y(), color.z());
                 glVertex3d(vertices_[vi].x(), vertices_[vi].y(), vertices_[vi].z());
             }
             glEnd();
         }
     }
-    auto NGon::perturb(bool inPositive) const -> void
+    auto NGon::perturb(bool inPositive) -> void
     {
         // Keep track of the sum of all normals for each vertex
         Eigen::Vector3d perturbAmt[vertices_.size()];
+
         for (const auto& face : faces_)
         {
             for (int i = 0; i < face.size(); i++)
             {
-                auto [vi, ni, ti] = face.getVertex();
+                auto [vi, ni, ti] = face.getVertex(i);
 
                 perturbAmt[vi] += normals_[ni];
             }
@@ -94,7 +96,7 @@ namespace ngon
         // Perturb by the normalized pertub amount
         for (int i = 0; i < vertices_.size(); i++)
         {
-            vertices_[i] = vertices_[i] + perturbAmt[i].normalized() * (inPositive ? 1 : -1);
+            vertices_[i] = vertices_[i] + perturbAmt[i].normalized() * (inPositive ? 0.01 : -0.01);
         }
     }
 
@@ -118,41 +120,52 @@ namespace ngon
             textures.emplace_back(randomDouble(), randomDouble());
 
         // Generate the faces
-        NGon   ngon;
-        double t = 2 * M_PI / static_cast<double>(numSides);
-        for (int i = 0; i < numSides; i++)
+        NGon            ngon;
+        double          t = 2 * M_PI / static_cast<double>(numSides);
+        Eigen::Vector3d origin{ radius, 0, 0 };
+
+        std::vector<Eigen::Vector3d> faceVertices{};
+        faceVertices.emplace_back(radius, 0, 0);
+        std::vector<Eigen::Vector3d> faceNormals{};
+        std::vector<Eigen::Vector2d> faceTextures{};
+
+
+        for (int i = 1; i < numSides; i++)
         {
-            auto x  = radius * std::cos(t * i);
-            auto y  = radius * std::sin(t * i);
-            auto x_ = radius * std::cos(t * (i + 1));
-            auto y_ = radius * std::sin(t * (i + 1));
-            auto z  = 0;
+            auto x = radius * std::cos(t * i);
+            auto y = radius * std::sin(t * i);
+            // auto x_ = radius * std::cos(t * (i + 1));
+            // auto y_ = radius * std::sin(t * (i + 1));
+            auto z = 0;
 
-            std::vector<Eigen::Vector3d> faceVerticies{ { x, y, z }, { x_, y_, z }, { 0, 0, 0 } };
+            faceVertices.emplace_back(x, y, z);
 
-            std::vector<Eigen::Vector3d> faceNormals;
-            for (int j = 0; j < 3; j++)
-                faceNormals.push_back(
-                    normals[std::floor(randomDouble() * static_cast<int>(normals.size()))]);
+            // std::vector<Eigen::Vector3d> faceVerticies{ { x, y, z }, { x_, y_, z }, origin };
 
-            std::vector<Eigen::Vector2d> faceTextures;
-            for (int j = 0; j < 3; j++)
-                faceTextures.emplace_back(
-                    textures[std::floor(randomDouble() * static_cast<int>(textures.size()))]);
-            ngon.addFace(faceVerticies, faceNormals, faceTextures);
+            // std::vector<Eigen::Vector3d> faceNormals;
+            // for (int j = 0; j < 3; j++)
+            faceNormals.push_back(
+                normals[std::floor(randomDouble() * static_cast<int>(normals.size()))]);
+
+            // std::vector<Eigen::Vector2d> faceTextures;
+            // for (int j = 0; j < 3; j++)
+            faceTextures.emplace_back(
+                textures[std::floor(randomDouble() * static_cast<int>(textures.size()))]);
         }
+
+        ngon.addFace(faceVertices, faceNormals, faceTextures);
 
         return ngon;
     }
 
-auto generateColor(Eigen::Vector2d texCoords) -> Eigen::Vector3d
-{
-    auto ss = std::pow(texCoords.x(), 2);
-    auto tt = std::pow(texCoords.y(), 2);
-    auto smt = std::pow(texCoords.x() - texCoords.y(), 2);
-    auto denom = 3.0 / (ss + tt + smt + 1e-9);
+    auto generateColor(Eigen::Vector2d texCoords) -> Eigen::Vector3d
+    {
+        auto ss    = std::pow(texCoords.x(), 2);
+        auto tt    = std::pow(texCoords.y(), 2);
+        auto smt   = std::pow(texCoords.x() - texCoords.y(), 2);
+        auto denom = 3.0 / (ss + tt + smt + 1e-9);
 
-    return {ss * denom, tt * denom, smt * denom};
-}
+        return { ss * denom, tt * denom, smt * denom };
+    }
 
 }

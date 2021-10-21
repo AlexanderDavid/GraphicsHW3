@@ -59,10 +59,12 @@ namespace viewer
         {
             case 'd':
             {
+                ngon_.perturb(true);
                 break;
             }
             case 'D':
             {
+                ngon_.perturb(false);
                 break;
             }
         }
@@ -73,7 +75,7 @@ namespace viewer
         std::cout << "A - Increase Maximum Angle\n"
                   << "a - Decrease Maximum Angle\n"
                   << "B - Increase number of triangles\n"
-        << "b - Decrease number of triangles\n"
-        << "h - Print this usage\n";
+                  << "b - Decrease number of triangles\n"
+                  << "h - Print this usage\n";
     }
 }
