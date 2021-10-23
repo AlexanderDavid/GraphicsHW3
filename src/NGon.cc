@@ -65,7 +65,6 @@ namespace ngon
     {
         for (auto face : faces_)
         {
-            std::cout << textureCoords_.size() << "\n";
             glBegin(GL_POLYGON);
             for (int i = 0; i < face.size(); i++)
             {
@@ -98,6 +97,75 @@ namespace ngon
         {
             vertices_[i] = vertices_[i] + perturbAmt[i].normalized() * (inPositive ? 0.01 : -0.01);
         }
+    }
+
+    auto NGon::isConvex() const -> bool
+    {
+        // Adapted from https://stackoverflow.com/questions/471962/how-do-i-efficiently-determine-if-a-polygon-is-convex-non-convex-or-complex
+        for (const auto& face : faces_)
+        {
+            bool sign = false;
+            size_t n = face.size();
+            std::vector<size_t> vis{};
+
+            for (size_t i = 0; i < n; i++)
+            {
+                auto [vi, ni, ti] = face.getVertex(i);
+                vis.push_back(vi);
+            }
+
+            for (size_t i = 0; i < n; i++)
+            {
+                double dx1 = vertices_[vis[(i + 2) % n]].x() - vertices_[vis[(i + 1) % n]].x();
+                double dy1 = vertices_[vis[(i + 2) % n]].y() - vertices_[vis[(i + 1) % n]].y();
+                double dz1 = vertices_[vis[(i + 2) % n]].z() - vertices_[vis[(i + 1) % n]].z();
+                double dx2 = vertices_[vis[i]].x() - vertices_[vis[(i + 1) % n]].x();
+                double dy2 = vertices_[vis[i]].y() - vertices_[vis[(i + 1) % n]].y();
+                double dz2 = vertices_[vis[i]].z() - vertices_[vis[(i + 1) % n]].z();
+                double cross = dy1 * dz2 + dz1 * dx2 + dx1 * dy2;
+
+                if (i == 0)
+                {
+                    sign = cross > 0;
+                }
+                else if (sign != (cross > 0))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    auto NGon::isPlanar() const -> bool {
+        for (const auto& face : faces_)
+        {
+            size_t n = face.size();
+            std::vector<size_t> vis{};
+
+            for (size_t i = 0; i < n; i++)
+            {
+                auto [vi, ni, ti] = face.getVertex(i);
+                vis.push_back(vi);
+            }
+
+            Eigen::Hyperplane<double, 3> plane = Eigen::Hyperplane<double, 3>::Through(
+                vertices_[vis[0]],
+                vertices_[vis[1]],
+                vertices_[vis[2]]
+            );
+
+            for (size_t i = 3; i < n; i++)
+            {
+                // If the point is outside of some epsilon of the plane return false
+                if (plane.signedDistance(vertices_[vis[i]]) > 10e-5)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     auto generateSymmetricNGon(size_t                 numSides,
@@ -151,6 +219,17 @@ namespace ngon
             // for (int j = 0; j < 3; j++)
             faceTextures.emplace_back(
                 textures[std::floor(randomDouble() * static_cast<int>(textures.size()))]);
+        }
+
+        // Rotate all verticies to the new normal
+        Eigen::Vector3d defaultNormal = {0, 0, 1};
+        Eigen::Vector3d axis = normal.cross(defaultNormal).normalized();
+        double angle = std::acos(normal.dot(defaultNormal) / std::sqrt(normal.norm()));
+        Eigen::AngleAxis<double> rot {angle, axis};
+
+        for (auto & faceVertex : faceVertices)
+        {
+            faceVertex = (rot * faceVertex) + center;
         }
 
         ngon.addFace(faceVertices, faceNormals, faceTextures);

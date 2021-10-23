@@ -67,15 +67,22 @@ namespace viewer
                 ngon_.perturb(false);
                 break;
             }
+            default:
+            {
+                usage();
+            }
         }
+
+        std::cout << "NGon" << (ngon_.isPlanar() ? " is " : " is not ") << "planar\n";
+        std::cout << "    " << (ngon_.isConvex() ? " is " : " is not ") << "convex\n";
     }
 
     auto NGonViewer::usage() const -> void
     {
-        std::cout << "A - Increase Maximum Angle\n"
-                  << "a - Decrease Maximum Angle\n"
-                  << "B - Increase number of triangles\n"
-                  << "b - Decrease number of triangles\n"
+        std::cout << "D - Perturb positive\n"
+                  << "d - Perturb negative\n"
                   << "h - Print this usage\n";
+        std::cout << "NGon" << (ngon_.isPlanar() ? " is " : " is not ") << "planar\n";
+        std::cout << "    " << (ngon_.isConvex() ? " is " : " is not ") << "convex\n";
     }
 }

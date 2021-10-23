@@ -23,6 +23,10 @@ namespace ngon
 
         [[nodiscard]] inline auto size() const noexcept -> size_t;
 
+        [[nodiscard]] auto isPlanar() const -> bool;
+
+        [[nodiscard]] auto isConvex() const -> bool;
+
     private:
         std::vector<Eigen::Vector3d> vertices_{};
         std::vector<Eigen::Vector3d> normals_{};
